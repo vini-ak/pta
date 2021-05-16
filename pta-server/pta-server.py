@@ -2,6 +2,7 @@ from socket import *
 import os 
 from exceptions.command_doesnt_exists import CommandDoesntExists
 from exceptions.cump_not_done import CUMPNotDone
+from exceptions.cump_was_done import TryingToCUMPAgain
 from exceptions.user_is_invalid import UserIsInvalid
 from exceptions.no_given_user import NoGivenUser
 
@@ -59,8 +60,6 @@ class PTAServer:
                 if len(msg_terms) == 3:
                     ARGS_PEDIDO = msg_terms[2]
                 
-                print(COMMAND)
-
                 # RESPOSTA:
                 # SEQ_NUM REPLY ARGS_RESP
                 ARGS_RESP = ''
@@ -73,12 +72,14 @@ class PTAServer:
 
                     if not self._cump_was_done and COMMAND != "CUMP":
                         raise CUMPNotDone()
+                    elif self._cump_was_done and COMMAND == "CUMP":
+                        raise TryingToCUMPAgain()
                     else:
                         self._setCUMP()
 
                     REPLY = "OK"
 
-                except (CommandDoesntExists, CUMPNotDone, NoGivenUser, UserIsInvalid):
+                except (CommandDoesntExists, CUMPNotDone, NoGivenUser, UserIsInvalid, TryingToCUMPAgain):
                     REPLY = "NOK"
                 
                 finally:
@@ -87,7 +88,6 @@ class PTAServer:
                         response = response + " " + ARGS_RESP
                         
                     ascii = response.encode('ascii')
-                    print(ascii)
                         
                     connectionSocket.send(ascii)
                     connectionSocket.close()
@@ -112,9 +112,7 @@ class PTAServer:
         file = open('./pta-server/users.txt', 'r')
         users = file.read().splitlines()
 
-        print(username)
-        print(users)
-
+        
         if(username not in users):
             raise UserIsInvalid()
         
@@ -130,7 +128,4 @@ class PTAServer:
 
 if(__name__ == '__main__'):
     server = PTAServer()
-    print(server.getFileList())
-    print(server.port)
-
     server.run()
