@@ -6,5 +6,3 @@ class CommandDoesntExists(Exception):
         - PEGA
         - TERM
     '''
-
-    super.__init__()
