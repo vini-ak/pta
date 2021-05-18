@@ -3,6 +3,7 @@ import os
 from exceptions.command_doesnt_exists import CommandDoesntExists
 from exceptions.cump_not_done import CUMPNotDone
 from exceptions.cump_was_done import TryingToCUMPAgain
+from exceptions.file_doesnt_exist import FileDoesntExist
 from exceptions.user_is_invalid import UserIsInvalid
 from exceptions.no_given_user import NoGivenUser
 from modules.file_reader import FileReader
@@ -48,18 +49,28 @@ class PTAServer:
             # Caso o usuário seja válido, ele assumirá esse valor
             # Se não, cairá em uma das exceções tratadas e receberá NOK
             self.__REPLY = "OK"
+
         elif cmd == "LIST":
-            self.__REPLY = "ARQS" 
 
             totalOfFiles = self.getTotalOfFiles()
             fileNames = self.sendFileNames()
-
+            
             self.__ARGS_RESP = str(totalOfFiles) + " " + fileNames
+            self.__REPLY = "ARQS" 
 
         elif cmd == "PEGA":
-            print()
+            file = self.getFileByName()
+
+            fileSize = file.size
+            fileText = file.content
+
+            self.__ARGS_RESP = str(fileSize) + " " + str(fileText)
+            self.__REPLY = "ARQ" 
+
+
         elif cmd == "TERM":
             self.__REPLY = "OK"
+
         else:
             raise CommandDoesntExists()
 
@@ -91,7 +102,7 @@ class PTAServer:
                         self._setCUMP()
                     
 
-                except (CommandDoesntExists, CUMPNotDone, NoGivenUser, UserIsInvalid, TryingToCUMPAgain):
+                except (CommandDoesntExists, CUMPNotDone, NoGivenUser, UserIsInvalid, TryingToCUMPAgain, FileDoesntExist):
                     self.__REPLY = "NOK"
                 
                 finally:
@@ -102,14 +113,14 @@ class PTAServer:
                         response = response + " " + self.__ARGS_RESP
                         
                     ascii = response.encode('ascii')
-
                     connectionSocket.send(ascii)
 
                     # Para fechar a conexão, a resposta tem que ser diferente de OK e 
                     # os comandos não podem ser LIST ou PEGA
-                    if self.__REPLY != "OK" and not (self.__COMMAND == "LIST" or (self.__COMMAND == "PEGA")):
+                    if self.__COMMAND == "TERM" or (self.__REPLY != "OK" and not (self.__COMMAND == "LIST" or (self.__COMMAND == "PEGA"))):
                         connectionSocket.close()
                         self._socketIsClosed = True
+
                     else:
                         self._socketIsClosed = False
 
@@ -143,6 +154,17 @@ class PTAServer:
     
     def _setCUMP(self):
         self._cump_was_done = True
+    
+    def getFileByName(self):
+        fileName = self.__ARGS_PEDIDO
+
+        if fileName not in self._files:
+            raise FileDoesntExist()
+        else:
+            file = FileReader(fileName)
+            return file
+            
+
 
 
 
