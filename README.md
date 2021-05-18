@@ -1,13 +1,15 @@
 # Practical Exam
-Please **fork** this repo and **develop your server** based on the protocol described in pta.pdf file (in portuguese). Before coding, I suggest you carefully read the document spec and understand the protocol. Experiment the protocol, using paper and pencil, drawing examples of protocol usage.
+Bibliotecas utilizadas:
 
-Please develop your server code in the directory [pta-server][ptas]. The user list that must be accepted by the protocol must be read from the [pta-server/users.txt][ptau] file. The files to be served by your server are in the [pta-server/files][ptaa] directory. Please don't change these files and directories.
+- **socket**: essa lib está sendo utilizada para podermos criar uma conexão TCP/IP entre o cliente e o servidor.
+- **os** esta lib é utilizada para facilitar as operações que são executadas pelo sistema operacional. Estou utilizando para pegar informações relativas aos paths de arquivos e diretórios e recuperar algumas informações sobre os arquivos (ex: tamanho do arquivo em bytes).
 
-Your server code will be evaluated through an automatic testing tool. This way, in order to test your code you can use the [pta-client.py][ptac] file. This file makes some tests but it is not an extensive test. So, keep in mind that the actual evaluation will test other aspects of your protocol implementation.
 
-You could use **any programming language**. But you must provide instructions in order to successfully run your code. Describe all stuff about libraries, interpreters, versions and so on. After finishing development, you must share the link of your github repo in the evaluation environment ([ava.ufrpe.br](http://ava.ufrpe.br/)).
+Organização do projeto ([pta-server/]):
 
-[ptas]: <https://github.com/glaucogoncalves/pta/tree/master/pta-server>
-[ptau]: <https://github.com/glaucogoncalves/pta/tree/master/pta-server/users.txt>
-[ptaa]: <https://github.com/glaucogoncalves/pta/tree/master/pta-server/files>
-[ptac]: <https://github.com/glaucogoncalves/pta/tree/master/pta-client.py>
+- **exceptions/**: contém as exceções para os tratamentos de erro do servidor.
+- **files/**: contém os arquivos a serem consultados pelo cliente com os comandos [PEGA] e [TERM].
+- **modules/**: criado para modularizar e organizar o projeto em objetos menores. No caso, criei apenas o módulo [FileReader]
+    -- **file_reader.py**: módulo para capturar as informações de um arquivo. Ele será usado quando o cliente enviar um comando [PEGA].
+- **pta-server.py**: arquivo do servidor.
+- **user.txt**: lista de usuários que possuem acesso ao PTA.
