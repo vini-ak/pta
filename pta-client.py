@@ -88,6 +88,8 @@ def test3(sckt):
   while 1:
     data, addr = sckt.recvfrom(2048)
     data = data.decode()
+    filesTotal = 0
+    
     if commandUnknow:
         try:
             commandUnknow = False
